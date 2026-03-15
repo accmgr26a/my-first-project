@@ -1,30 +1,86 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <title>My iPad Site</title>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Recorder</title>
     <style>
-      body {
-        background-color: #f0f8ff;
-        font-family: sans-serif;
-        text-align: center;
-      }
-      h1 {
-        color: darkblue;
-      }
-      button {
-        background-color: orange;
-        padding: 10px 20px;
-        border-radius: 10px;
-        border: none;
-      }
+        body { font-family: -apple-system, sans-serif; background: #f4f7f6; padding: 20px; }
+        .container { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); max-width: 400px; margin: auto; }
+        h2 { color: #2c3e50; text-align: center; }
+        label { display: block; margin-top: 10px; font-weight: bold; }
+        input, select { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; }
+        button { width: 100%; background: #27ae60; color: white; border: none; padding: 12px; margin-top: 20px; border-radius: 8px; font-size: 16px; }
+        table { width: 100%; margin-top: 20px; border-collapse: collapse; }
+        th, td { text-align: left; padding: 10px; border-bottom: 1px solid #ddd; }
     </style>
-  </head>
-  <body>
+</head>
+<body>
 
-    <h1>Welcome to my iPad Kingdom!</h1>
-    <p>This page was hand-coded on a 10th Gen iPad.</p>
+<div class="container">
+    <h2>Council Tracker</h2>
     
-    <button onclick="alert('Hello from the iPad!')">Tap Me!</button>
+    <label>Type</label>
+    <select id="type">
+        <option value="Rent">Council Rent</option>
+        <option value="Tax">Council Tax</option>
+    </select>
 
-  </body>
+    <label>Amount (£)</label>
+    <input type="number" id="amount" placeholder="e.g. 150">
+
+    <label>Date</label>
+    <input type="date" id="date">
+
+    <button onclick="savePayment()">Record Payment</button>
+
+    <h3>History</h3>
+    <table id="historyTable">
+        <thead>
+            <tr>
+                <th>Type</th>
+                <th>Amt</th>
+                <th>Date</th>
+            </tr>
+        </thead>
+        <tbody id="historyBody"></tbody>
+    </table>
+</div>
+
+<script>
+    function savePayment() {
+        const type = document.getElementById('type').value;
+        const amount = document.getElementById('amount').value;
+        const date = document.getElementById('date').value;
+
+        if(!amount || !date) { alert('Please fill in all fields'); return; }
+
+        const payment = { type, amount, date };
+        
+        // Get existing data from iPad storage or start new list
+        let history = JSON.parse(localStorage.getItem('payments')) || [];
+        history.push(payment);
+        
+        // Save back to iPad storage
+        localStorage.setItem('payments', JSON.stringify(history));
+        
+        displayHistory();
+    }
+
+    function displayHistory() {
+        const history = JSON.parse(localStorage.getItem('payments')) || [];
+        const body = document.getElementById('historyBody');
+        body.innerHTML = ''; // Clear current table
+
+        history.forEach(item => {
+            let row = `<tr><td>${item.type}</td><td>£${item.amount}</td><td>${item.date}</td></tr>`;
+            body.innerHTML += row;
+        });
+    }
+
+    // Show history when the page loads
+    displayHistory();
+</script>
+
+</body>
 </html>
