@@ -54,6 +54,16 @@ function execute(cmd, params) {
         logs.forEach(log => {
             content += `${log.date} | ${log.type}: £${log.amount} (${log.status})\n`;
         });
+    else if (cmd === 'delete') {
+        const index = parseInt(params[0]) - 1; // "delete 1" targets the 1st item
+        if (index >= 0 && index < logs.length) {
+            const removed = logs.splice(index, 1);
+            localStorage.setItem('my_records', JSON.stringify(logs));
+            response = `DELETED: ${removed[0].type} from ${removed[0].date}`;
+        } else {
+            response = "ERROR: Invalid index. Use 'view' to check numbers.";
+        }
+    }
 
         // 2. Create the file "Blob"
         const blob = new Blob([content], { type: 'text/plain' });
