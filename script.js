@@ -1,3 +1,4 @@
+alert("The brain is awake!");
 const input = document.getElementById('command-input');
 const output = document.getElementById('output');
 
