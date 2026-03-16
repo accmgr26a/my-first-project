@@ -1,17 +1,16 @@
 const input = document.getElementById('command-input');
 const output = document.getElementById('output');
 
-// Our digital notepad for records
-let logs = [
+// 1. LOAD: Look in the iPad's filing cabinet first. If empty, use default.
+let logs = JSON.parse(localStorage.getItem('my_records')) || [
     { type: 'Rent', amount: 550, date: '2026-03-01', status: 'Paid' }
 ];
 
 input.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') {
         const entry = input.value.trim();
-        const args = entry.split(' '); // Splits "paid 100" into ["paid", "100"]
+        const args = entry.split(' ');
         const command = args[0].toLowerCase();
-        
         execute(command, args.slice(1));
         input.value = '';
     }
@@ -21,17 +20,15 @@ function execute(cmd, params) {
     let response = '';
 
     if (cmd === 'help') {
-        response = 'COMMANDS: view, add [type] [amount], clear';
+        response = 'COMMANDS: view, add [type] [amount], clear, reset';
     } 
     else if (cmd === 'view') {
-        // Look through our logs and format them
         response = '--- CURRENT RECORDS ---\n';
         logs.forEach(log => {
             response += `${log.date} | ${log.type}: £${log.amount} (${log.status})\n`;
         });
     } 
     else if (cmd === 'add') {
-        // Usage: add tax 120
         const type = params[0] || 'Misc';
         const amount = params[1] || 0;
         const newEntry = {
@@ -41,7 +38,15 @@ function execute(cmd, params) {
             status: 'Recorded'
         };
         logs.push(newEntry);
+        
+        // 2. SAVE: Put the updated list back in the filing cabinet
+        localStorage.setItem('my_records', JSON.stringify(logs));
+        
         response = `SUCCESS: Added ${type} payment of £${amount}.`;
+    }
+    else if (cmd === 'reset') {
+        localStorage.removeItem('my_records');
+        response = 'Memory cleared. Refresh to see defaults.';
     }
     else if (cmd === 'clear') {
         output.innerHTML = '';
