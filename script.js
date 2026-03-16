@@ -1,62 +1,19 @@
-const input = document.getElementById('command-input');
-const output = document.getElementById('output');
+    else if (cmd === 'total') {
+        let rentTotal = 0;
+        let taxTotal = 0;
 
-// 1. LOAD: Look in the iPad's filing cabinet first. If empty, use default.
-let logs = JSON.parse(localStorage.getItem('my_records')) || [
-    { type: 'Rent', amount: 550, date: '2026-03-01', status: 'Paid' }
-];
-
-input.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') {
-        const entry = input.value.trim();
-        const args = entry.split(' ');
-        const command = args[0].toLowerCase();
-        execute(command, args.slice(1));
-        input.value = '';
-    }
-});
-
-function execute(cmd, params) {
-    let response = '';
-
-    if (cmd === 'help') {
-        response = 'COMMANDS: view, add [type] [amount], clear, reset';
-    } 
-    else if (cmd === 'view') {
-        response = '--- CURRENT RECORDS ---\n';
+        // Loop through the list and add up the amounts
         logs.forEach(log => {
-            response += `${log.date} | ${log.type}: £${log.amount} (${log.status})\n`;
+            let val = parseFloat(log.amount);
+            if (log.type.toLowerCase() === 'rent') {
+                rentTotal += val;
+            } else if (log.type.toLowerCase() === 'tax') {
+                taxTotal += val;
+            }
         });
-    } 
-    else if (cmd === 'add') {
-        const type = params[0] || 'Misc';
-        const amount = params[1] || 0;
-        const newEntry = {
-            type: type.charAt(0).toUpperCase() + type.slice(1),
-            amount: amount,
-            date: new Date().toISOString().split('T')[0],
-            status: 'Recorded'
-        };
-        logs.push(newEntry);
-        
-        // 2. SAVE: Put the updated list back in the filing cabinet
-        localStorage.setItem('my_records', JSON.stringify(logs));
-        
-        response = `SUCCESS: Added ${type} payment of £${amount}.`;
-    }
-    else if (cmd === 'reset') {
-        localStorage.removeItem('my_records');
-        response = 'Memory cleared. Refresh to see defaults.';
-    }
-    else if (cmd === 'clear') {
-        output.innerHTML = '';
-        return;
-    } else {
-        response = `Unknown command: ${cmd}`;
-    }
 
-    const line = document.createElement('div');
-    line.innerHTML = `<span style="color: #fff;">> ${cmd} ${params.join(' ')}</span><br>${response}<br><br>`;
-    output.appendChild(line);
-    window.scrollTo(0, document.body.scrollHeight);
-}
+        response = `--- FINANCIAL SUMMARY ---\n`;
+        response += `Total Rent Paid: £${rentTotal.toFixed(2)}\n`;
+        response += `Total Tax Paid:  £${taxTotal.toFixed(2)}\n`;
+        response += `GRAND TOTAL:     £${(rentTotal + taxTotal).toFixed(2)}`;
+    }
