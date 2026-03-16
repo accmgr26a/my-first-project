@@ -48,6 +48,28 @@ function execute(cmd, params) {
             if (l.type.toLowerCase() === 'rent') rTotal += v;
             else if (l.type.toLowerCase() === 'tax') tTotal += v;
         });
+            else if (cmd === 'export') {
+        // 1. Format the data into a readable string
+        let content = "RENT & TAX RECORDS\n==================\n\n";
+        logs.forEach(log => {
+            content += `${log.date} | ${log.type}: £${log.amount} (${log.status})\n`;
+        });
+
+        // 2. Create the file "Blob"
+        const blob = new Blob([content], { type: 'text/plain' });
+        const url = window.URL.createObjectURL(blob);
+        
+        // 3. Create a hidden link and "click" it
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `records_${new Date().toISOString().split('T')[0]}.txt`;
+        a.click();
+        
+        // 4. Clean up
+        window.URL.revokeObjectURL(url);
+        response = "SUCCESS: File 'records.txt' generated. Check your Downloads.";
+    }
+
         response = `RENT TOTAL: £${rTotal.toFixed(2)}\nTAX TOTAL:  £${tTotal.toFixed(2)}`;
     }
     else if (cmd === 'reset') {
