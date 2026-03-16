@@ -36,4 +36,7 @@ body {
 #terminal {
     text-shadow: 0 0 5px #00ff41;
 }
+#terminal {
+    padding-bottom: 300px; /* Gives you space for the iPad keyboard */
+}
 
